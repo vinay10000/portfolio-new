@@ -13,6 +13,10 @@ const STATIC_ROUTES = [
   { path: "/gears", priority: 0.6, freq: "monthly" as const },
 ];
 
+// Required for `output: "export"`. The build cannot prove `new Date()` and
+// `site.url` are static, so without this Next treats the route as dynamic.
+export const dynamic = "force-static";
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 

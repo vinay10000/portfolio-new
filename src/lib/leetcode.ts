@@ -2,8 +2,10 @@
  * Solved-problem counts from LeetCode, via the community API at
  * https://github.com/alfaarghya/alfa-leetcode-api (MIT).
  *
- * Fetched on the server and revalidated hourly. If the upstream API is slow,
- * rate limited or down, `getSolved` returns null and the caller omits the card
+ * Fetched once at build time. This site is a static export (Cloudflare Pages
+ * serves files, not a server), so the counts are baked into the HTML on deploy
+ * and only move when the site is rebuilt. If the upstream API is slow, rate
+ * limited or down, `getSolved` returns null and the caller omits the card
  * rather than rendering a broken one or inventing numbers.
  */
 
@@ -28,9 +30,10 @@ type SolvedResponse = {
 export async function getSolved(): Promise<Solved | null> {
   try {
     const res = await fetch(ENDPOINT, {
-      // Counts move slowly. An hour keeps the page cheap without the number
-      // looking stale.
-      next: { revalidate: 3600 },
+      // `next.revalidate` is an ISR option and this site is exported statically,
+      // so it is not available. `force-cache` lets the build reuse the response
+      // instead of refetching it once per page that calls this.
+      cache: "force-cache",
       signal: AbortSignal.timeout(8000),
     });
     if (!res.ok) return null;

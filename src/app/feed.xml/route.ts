@@ -16,6 +16,11 @@ export function generateMetadata() {
   };
 }
 
+// A static export has no server to run this on, so the feed is written to a
+// plain file at build time and served as a static asset. Without this, Next
+// treats the handler as dynamic and refuses to export the site.
+export const dynamic = "force-static";
+
 export async function GET() {
   const posts = getAllPosts();
   const updated = posts[0]?.date ?? new Date().toISOString().slice(0, 10);

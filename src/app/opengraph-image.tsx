@@ -5,6 +5,10 @@ export const alt = `${site.name} - ${site.role}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+// Required for `output: "export"`: the PNG is rendered once during the build
+// and written out as a file, since there is no server to render it on request.
+export const dynamic = "force-static";
+
 export default async function OpengraphImage() {
   return new ImageResponse(
     (
