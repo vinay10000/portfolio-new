@@ -1,0 +1,42 @@
+oneko.gif
+=========
+
+oneko.gif is a 256x128 sprite sheet arranged as a 32px grid, 8 cells wide and 4
+tall (32 cells total). It is black line art on a transparent background, so
+src/components/oneko.tsx uses the sprite's alpha channel as a mask and fills
+that mask with a flat colour. The sheet is addressed with negative cell
+coordinates relative to its bottom-right cell.
+
+Source
+------
+    https://github.com/adryd325/oneko.js
+    The cat sprite sheet shipped with that project.
+
+Licence
+-------
+MIT License
+
+Copyright (c) 2022 adryd325
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Changes made in this project
+----------------------------
+The sprite is unmodified. The chase behaviour, frame table wiring and colour
+masking in src/components/oneko.tsx are this project's own work, derived from
+the behaviour of the original oneko.js demo.

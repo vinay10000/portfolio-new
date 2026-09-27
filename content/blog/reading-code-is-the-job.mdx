@@ -1,0 +1,57 @@
+---
+title: "Reading Code Is The Actual Job"
+description: "Most of programming is not writing code. It is working out what code you did not write."
+date: "2026-07-29"
+category: "Engineering"
+tags: ["Craft", "Debugging", "Reading"]
+---
+
+I used to think programming was mostly typing. You had an idea, you expressed it,
+you moved on. Writing the code was the work.
+
+It is not. Most of a working day is reading code somebody else wrote, working out
+what it does, and deciding whether to change it or route around it. The typing is
+almost incidental.
+
+## The stack trace lies
+
+A stack trace tells you where the error surfaced. It rarely tells you where the
+problem started. This is the gap that costs me the most time.
+
+An error thrown deep inside a data layer, surfaced in a request handler, printed on
+a page six layers of abstraction away from the actual mistake. The line the stack
+points at is genuinely, technically correct. It is just not where the bug is.
+
+So I stopped starting there. Now I start from the last state I know was correct and
+walk forward until the behaviour diverges from what I expected. It is slower and
+much more reliable, because each step is a fact rather than a guess.
+
+## Reading well is a skill
+
+The thing that changed for me was learning to read for *intent* rather than for
+*implementation*. Implementation is the easy half. You can read a function top to
+bottom in ten seconds and understand every line. That understanding is worthless if
+you do not know why it is shaped that way.
+
+Some questions I ask now, in roughly this order:
+
+- What is this function pretending to be? Not what it does. What it is standing in
+  for, at the level the caller cares about.
+- What would break if I changed its signature? If the answer is "only this caller",
+  the abstraction is not earning its keep.
+- Is this branch reachable? Dead branches are not free, they are misleading.
+- Why is this here at all? Most code exists for a reason that has since expired.
+
+That last one is the most useful. Code outlives its reasons constantly, and nobody
+goes back to check. A surprising amount of a mature codebase is scar tissue around
+a bug that was fixed a different way three years ago.
+
+## The uncomfortable conclusion
+
+If reading is the job, then the highest-leverage thing I can do for a codebase is
+make it easier to read. That means boring names, fewer layers, smaller functions,
+and deleting things rather than adding things.
+
+It also means I should have been spending my time on this for years instead of on
+learning one more framework. That is a slightly deflating thing to work out, but I
+would rather know now than in another five years.

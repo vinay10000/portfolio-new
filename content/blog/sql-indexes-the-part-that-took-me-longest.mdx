@@ -1,0 +1,52 @@
+---
+title: "SQL Indexes, The Part That Took Me Longest"
+description: "I knew what an index was. I did not know when adding one made things slower."
+date: "2026-01-20"
+category: "Engineering"
+tags: ["SQL", "Postgres", "Performance"]
+---
+
+Indexes were the first database thing I could not learn from reading. Every
+tutorial showed `CREATE INDEX` and said it makes queries faster, and I believed
+it, and then I added three of them to a table and a write-heavy job got slower.
+
+That is the whole post, really, but let me be specific about what I got wrong.
+
+## The mental model I had
+
+"Reads are common, writes are rare, so index everything you read by." That is a
+reasonable-sounding model and it is wrong often enough to cost you an afternoon.
+
+An index is not free. Every insert has to update it. Every update has to move it.
+On a table with heavy write traffic, an index on a low-cardinality column can make
+inserts measurably slower while barely helping any query, because the planner
+decides a sequential scan is cheaper than walking the index anyway.
+
+## What actually helped
+
+**Look at the query plan before you index anything.** `EXPLAIN ANALYZE` on the
+real query. I had been indexing based on which columns appeared in `WHERE`, which
+tells you nothing about cardinality. `WHERE status = 'active'` on a million rows
+is not selective. `WHERE id = $1` always is.
+
+**Index the columns you sort and join on, not just the ones you filter on.** My
+biggest win came from a composite index matching the exact order of a `WHERE` plus
+an `ORDER BY`, which let Postgres stop sorting entirely.
+
+**Watch what you unindexed.** When a slow query was fixed, I dropped the index I
+had added for it months earlier and nothing changed. It had been pure cost.
+
+**Trust the measurements over the intuition.** My intuition said the job was slow
+because of the database. The plan said it was slow because of a sequential scan
+on a table that had not been vacuumed since a bulk load.
+
+## The part I actually needed to hear
+
+An index is not an optimisation you add. It is a structure you pay for on every
+write, in exchange for not paying a cost on some reads. Whether that trade is
+good depends entirely on the ratio of your reads to your writes, which is a fact
+about your application that no amount of reasoning about the query will tell you.
+
+Once I stopped thinking of it as free speed and started thinking of it as a
+bet, it stopped being confusing. You do not place a bet you cannot justify, and
+`EXPLAIN ANALYZE` is how you check whether you won.

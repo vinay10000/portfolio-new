@@ -1,69 +1,220 @@
+import Link from "next/link";
 import Image from "next/image";
+import { CopyButton } from "@/components/copy-button";
+import { QuoteCard } from "@/components/quote-card";
+import { Section, SectionLink, StatusBadge } from "@/components/ui";
+import { SocialIcon } from "@/components/icons";
+import { experiences, recentExperienceCount } from "@/lib/experience";
+import { placeLabel } from "@/lib/format";
+import { getRecentPosts } from "@/lib/posts";
+import { projects } from "@/lib/projects";
+import { site, socials } from "@/lib/site";
+import { PostRow, ProjectBody } from "@/components/post-row";
+import { TechRow } from "@/components/tech-tile";
 
-export default function Home() {
+export default function HomePage() {
+  const recent = experiences.slice(0, recentExperienceCount);
+  const posts = getRecentPosts(3);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
+    <div className="pb-4">
+      {/* Hero. The name and the mark sit on one baseline, the way a byline
+          does in print, rather than stacking into a centred hero block. */}
+      <section className="flex items-start gap-4">
         <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
+          src="/logo-256.png"
+          alt={`${site.name}, ${site.role}`}
+          width={80}
+          height={80}
+          className="mt-0.5 h-16 w-16 shrink-0 rounded-full sm:h-20 sm:w-20"
           priority
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+        <div className="min-w-0 pt-1">
+          <h1 className="text-[24px] font-bold leading-8 tracking-tight text-[var(--heading-ink)]">
+            {site.name}
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+            <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[14px] text-[var(--muted-foreground)]">
+              <span>{site.role}</span>
+              <span aria-hidden="true">·</span>
+              <CopyButton
+                value={site.email}
+                label={site.email}
+                copiedLabel="Email copied"
+                className="border-transparent bg-transparent px-1.5 py-0.5 font-mono text-[13px] hover:border-[var(--border)] hover:bg-[var(--card)]"
+              >
+                {site.email}
+              </CopyButton>
+              <span aria-hidden="true">·</span>
+              <span>{site.location}</span>
+            </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+      </section>
+
+      <p className="mt-4 max-w-[72ch] text-pretty text-[14px] leading-5 text-[var(--muted-foreground)]">
+        {site.summary}
+      </p>
+
+      <ul className="mt-4 flex flex-wrap items-center gap-1.5">
+        {socials.map((s) => (
+          <li key={s.label}>
+            <a
+              href={s.href}
+              target={s.href.startsWith("mailto:") ? undefined : "_blank"}
+              rel="noopener noreferrer"
+              aria-label={s.label}
+              title={s.label}
+              className="grid h-8 w-8 place-items-center rounded-[var(--radius)] text-[var(--muted-foreground)] transition-colors duration-150 hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)]"
+            >
+              <SocialIcon name={s.icon} width={17} height={17} />
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      <Section title="Experience" className="mt-12">
+        <ul>
+          {recent.map((e) => (
+            <li
+              key={`${e.company}-${e.role}`}
+              className="border-b border-[var(--border)] py-4 first:pt-1"
+            >
+              <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+                <div className="min-w-0">
+                  <p className="flex flex-wrap items-center gap-2 text-[17px] font-bold leading-6 text-[var(--heading-ink)]">
+                    {e.company}
+                    {e.current ? <StatusBadge>Working</StatusBadge> : null}
+                  </p>
+                  <p className="mt-0.5 text-[13px] text-[var(--muted-foreground)]">
+                    {e.role}
+                  </p>
+                </div>
+                <div className="text-right text-[13px] leading-5 text-[var(--muted-foreground)]">
+                  <p>
+                    {e.start} – {e.end}
+                  </p>
+                  <p>{placeLabel(e)}</p>
+                </div>
+              </div>
+              <details className="group mt-1.5">
+                <summary className="inline-flex cursor-pointer list-none items-center gap-1 text-[12px] text-[var(--muted-foreground)] transition-colors duration-150 hover:text-[var(--foreground)]">
+                  <span className="transition-transform duration-200 group-open:rotate-180">
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M6 9.5l6 6 6-6" />
+                    </svg>
+                  </span>
+                  <span className="group-open:hidden">Expand details</span>
+                  <span className="hidden group-open:inline">Collapse details</span>
+                </summary>
+                <div className="mt-2.5">
+                  <p className="max-w-[60ch] text-[13px] leading-5 text-[var(--muted-foreground)]">
+                    {e.summary}
+                  </p>
+                  <TechRow tech={e.tech} />
+                </div>
+              </details>
+            </li>
+          ))}
+        </ul>
+
+        {experiences.length > recent.length ? (
+          <div className="pt-5">
+            <Link
+              href="/work"
+              className="inline-flex items-center rounded-[var(--radius)] border border-[var(--border)] bg-[var(--card)] px-3.5 py-2 text-[13px] text-[var(--foreground)] transition-colors duration-150 hover:border-[color-mix(in_oklab,var(--foreground)_25%,transparent)] hover:bg-[var(--accent)]"
+            >
+              Show all work experiences
+            </Link>
+          </div>
+        ) : null}
+      </Section>
+
+      <Section title="Blog" className="mt-12">
+        <ul>
+          {posts.map((p) => (
+            <PostRow key={p.slug} post={p} />
+          ))}
+        </ul>
+        <div className="pt-5">
+          <Link
+            href="/blog"
+            className="inline-flex items-center rounded-[var(--radius)] border border-[var(--border)] bg-[var(--card)] px-3.5 py-2 text-[13px] text-[var(--foreground)] transition-colors duration-150 hover:border-[color-mix(in_oklab,var(--foreground)_25%,transparent)] hover:bg-[var(--accent)]"
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            Show all posts
+          </Link>
         </div>
-      </main>
+      </Section>
+
+      <Section title="Projects" className="mt-12">
+        <ul>
+          {projects.map((p) => (
+            <li key={p.name} className="border-b border-[var(--border)] py-4 first:pt-1">
+              <article>
+                {p.href ? (
+                  <a
+                    href={p.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group block rounded-[var(--radius)]"
+                  >
+                    <ProjectBody project={p} />
+                  </a>
+                ) : (
+                  <div className="group">
+                    <ProjectBody project={p} />
+                  </div>
+                )}
+              </article>
+            </li>
+          ))}
+        </ul>
+        <div className="pt-5">
+          <Link
+            href="/projects"
+            className="inline-flex items-center rounded-[var(--radius)] border border-[var(--border)] bg-[var(--card)] px-3.5 py-2 text-[13px] text-[var(--foreground)] transition-colors duration-150 hover:border-[color-mix(in_oklab,var(--foreground)_25%,transparent)] hover:bg-[var(--accent)]"
+          >
+            Show all projects
+          </Link>
+        </div>
+      </Section>
+
+      <Section title="Development" className="mt-12">
+        <div className="space-y-2">
+          <SectionLink
+            href="/gears"
+            title="Gears"
+            description="Tools, devices, and software I use to get work done."
+          />
+        </div>
+      </Section>
+
+      <Section title="Personal" className="mt-12">
+        <div className="space-y-2">
+          <SectionLink
+            href="/education"
+            title="Education"
+            description="Degree, certifications, and the tools I reach for."
+          />
+          <SectionLink
+            href="/movies"
+            title="Movies"
+            description="Films and shows that stuck with me."
+          />
+        </div>
+      </Section>
+
+      <div className="mt-12">
+        <QuoteCard />
+      </div>
     </div>
   );
 }

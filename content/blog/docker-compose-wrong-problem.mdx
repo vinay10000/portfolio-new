@@ -1,0 +1,78 @@
+---
+title: "Docker Compose Was Solving The Wrong Problem"
+description: "I spent a week making a local environment reproducible and then deleted most of it."
+date: "2026-04-14"
+category: "Engineering"
+tags: ["Docker", "Tooling", "Simplicity"]
+---
+
+I spent most of a week getting a four-service stack to boot from a single command.
+It was a genuinely nice piece of engineering and I have now deleted it.
+
+## What I thought I was fixing
+
+My local environment had drifted. It worked on my machine and broke on a clean
+one. So I did the reasonable thing: I containerised the database and the API and
+the worker and the frontend, wrote a Compose file, and made it reproducible.
+
+It worked. `docker compose up` and the whole thing came up, correctly, every time,
+on a laptop I had never seen before.
+
+Getting there meant pinning everything explicitly, which is the part people skip
+and then spend a day debugging:
+
+```bash
+docker compose up -d \
+  --build \
+  --pull always \
+  --env-file .env.local
+```
+
+The line continuations matter more than they look. A shell script assembled from
+an editor that eats trailing backslashes will silently run the first line and
+ignore the rest, so the build happens without `--pull always` and you spend an
+afternoon wondering why you are still on last week's base image.
+
+## What that actually bought me
+
+Reproducibility, which was the thing I wanted. And I got it. But I also got:
+
+- A 90-second cold start for a change that used to take 400ms
+- A rebuild step in the middle of every edit
+- A new failure mode where the container was stale and I was debugging my own
+  caching instead of my code
+- A volume-mount permission problem on Windows that cost half a day
+- A second mental model. Docker Compose was now a thing I had to hold in my head
+  alongside the app
+
+I had traded a small annoyance for a large one, and called it progress.
+
+## Where the line actually is
+
+The mistake was treating "reproducible" as a property of the whole environment
+when it is a property of the *dependencies*. A Postgres version drifts. A Node
+version drifts. An OS library drifts. Application code does not need to be in a
+container to be reproducible; it needs to be in version control, and its
+dependencies need pinning.
+
+So now I containerise only what is genuinely hard to reproduce: the database and
+nothing else. Postgres in a container, everything else runs natively, hot reload
+intact, a stack that comes up in about four seconds.
+
+That gives me almost all of the benefit and none of the tax.
+
+## The broader lesson
+
+This is the same shape as the "just delete it" instinct I keep having to
+relearn. The first solution to a problem is usually the one that addresses the
+symptom you noticed rather than the cause underneath it, and it is usually
+bigger than the thing that caused it.
+
+Reproducibility was the real problem. Containers everywhere were a very expensive
+answer to it. A pinned Postgres was a cheap one, and I only found that out by
+building the expensive answer first.
+
+That is the part I resent. It took a week to learn something a twenty-minute
+experiment would have told me. But I do not think I would have believed the
+twenty-minute version, because before I had built it, the week-long version
+sounded like the right answer.

@@ -1,0 +1,67 @@
+---
+title: "What I Keep In A Codebase"
+description: "Six kinds of file. Everything else is negotiable."
+date: "2026-03-02"
+category: "Engineering"
+tags: ["Craft", "Tooling", "Reading"]
+---
+
+I have a strong opinion about what belongs in a repository, and it is narrower
+than most people's.
+
+## The six
+
+1. **Source.** The thing the application is. Compiled, bundled, reviewed.
+2. **Lockfile.** The single highest-value file in the repository. It is also the
+   one most likely to be gitignored by someone in a hurry.
+3. **Config that is not secret.** Paths, feature flags, defaults. Secrets are
+   environment variables, and the example file showing their shape is committed.
+4. **Schema and migrations.** The shape of the data, and the ordered steps that
+   got it there.
+5. **Tests.** Not "good coverage", just the ones that encode a decision nobody
+   should have to rediscover.
+6. **The README.** What this is, how to run it, and what to do when it breaks.
+
+That is the list. It is shorter than most `src` folders.
+
+## What I do not keep
+
+**Generated output.** Build directories, compiled assets, `node_modules`. Not
+just because they are large, but because a repository that contains build output
+has two sources of truth and they will disagree.
+
+**Documentation for its own sake.** I have deleted more READMEs than I have
+written. A README that restates what the code does is worse than none, because it
+goes stale and then actively misleads. A README that explains *why* the code is
+the way it is earns its place forever.
+
+**Abstraction layers I might need.** "We might want to swap the database
+someday" is a real sentence people say, and I have said it. Every abstraction
+built in anticipation costs every reader who encounters it before the swap
+happens, and the swap usually does not happen.
+
+**Configuration for environments that do not exist.** Three deployment targets
+for an app with one user is three places to update something wrong.
+
+## Why the list is short
+
+A short list is a list you can actually keep true.
+
+The failure mode of a broad "what belongs in source control" is not that
+somebody adds one unnecessary file. It is that the rules become negotiable, and
+once they are negotiable they get negotiated in a hurry, and then you are back
+to a repository where nobody can tell what is authoritative.
+
+I would rather lose an argument about a README than lose the ability to trust the
+lockfile.
+
+## The test I use
+
+For any file, one question: **if this were deleted right now, what would break?**
+
+If the answer is "the build", it belongs in the repository only if it is
+generated from something that is. If the answer is "someone would be confused",
+the answer is a comment or a commit message, not a file. If the answer is
+"nothing, it was nice to have", it was not a file, it was a thought.
+
+That test has cost me a lot of files and saved me a lot of confusion.

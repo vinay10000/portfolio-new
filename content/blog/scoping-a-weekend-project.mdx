@@ -1,0 +1,63 @@
+---
+title: "What I Actually Write In A Weekend"
+description: "How I scope a side project so it survives past the first deploy."
+date: "2026-08-18"
+category: "Engineering"
+tags: ["Next.js", "Architecture", "Habits"]
+---
+
+Every side project I have ever abandoned died the same way. Not because the idea
+was bad, and not because I ran out of time. It died because I tried to build the
+whole thing before letting anyone use one part of it.
+
+## The mistake I kept making
+
+I would pick a scope, sit down on a Saturday, and try to finish it. Auth, database,
+API, dashboard, deployment. Five things that each look small and together look like
+a month of work. By Sunday evening I had a login form and a database schema and
+nothing anyone could actually see. The motivation drained out somewhere around hour
+eight, and I never went back.
+
+## What changed
+
+The projects that survived all did the same thing. I picked **one path** through the
+feature list and made that path work end to end before touching anything else.
+
+For a job board, that meant: a list of cards, read from a real database, served on
+a real URL. Not search, not applications, not messaging. Just the list.
+
+```ts
+// The whole first slice.
+const jobs = await db.job.findMany({ orderBy: { createdAt: "desc" } });
+return <JobList jobs={jobs} />;
+```
+
+Once that was live, every next feature had something to hang off. Search was an
+input and a `where` clause. Applications were a row and a status. None of it felt
+like starting over, because nothing had been thrown away.
+
+## The rules I use now
+
+1. **One path, not one feature.** "A user can sign up" is a feature. "A user can
+   sign up and create a project and see it on a dashboard" is a path. Ship the path.
+2. **Real data from day one.** SQLite or Postgres, not an array in a module. The
+   bugs that matter only appear once data has to survive a refresh.
+3. **Deploy before it is ready.** An ugly page on a real URL teaches you more in an
+   hour than a beautiful page on localhost teaches you in a week.
+4. **Write the README on day one.** If you cannot explain what it is in three
+   sentences, the scope is wrong. This is the check I skipped every time.
+
+## What I gave up
+
+Responsive design. Dark mode. Tests. A landing page with actual copy. All of that
+came later, and it came easily, because by then something existed to be polished.
+
+The counter-intuitive part is that cutting scope early made the final product
+better. I stopped adding features nobody asked for, because I could finally see
+which ones people actually used.
+
+## Where this leaves me
+
+I still abandon things. The difference is that abandoned things now have a URL and
+a README, so they are not lost. Some of them I pick up a year later with a clearer
+head, and that is usually when they turn into something worth keeping.
