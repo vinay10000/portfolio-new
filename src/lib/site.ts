@@ -1,8 +1,8 @@
 export const site = {
   name: "M.H. Vinay",
   shortName: "Vinay",
-  domain: "portfolio-new-cjh.pages.dev",
-  url: "https://portfolio-new-cjh.pages.dev",
+  domain: "mhvinay.pages.dev",
+  url: "https://mhvinay.pages.dev",
   role: "Software Engineer",
   email: "mhvinay5@gmail.com",
   location: "India",
