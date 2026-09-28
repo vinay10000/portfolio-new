@@ -4,12 +4,8 @@ import { getSolved } from "@/lib/leetcode";
 import { SocialIcon } from "./icons";
 import { LeetcodeRings } from "./activity-card";
 
-/** Set this in src/lib/site.ts to swap in a different playlist. */
-const SPOTIFY_PLAYLIST_ID = "4pMTjn9zGah0x9dAgJ9dLR";
-
 export async function SiteFooter() {
   const year = new Date().getFullYear();
-  const spotifySrc = `https://open.spotify.com/embed/playlist/${SPOTIFY_PLAYLIST_ID}?utm_source=generator&theme=0`;
   // Never null. Falls back to a committed snapshot when the upstream API is
   // down, so the card below can never be dropped from the build.
   const solved = await getSolved();
@@ -17,12 +13,14 @@ export async function SiteFooter() {
   return (
     <footer className="mt-16 border-t border-[var(--border)] bg-[var(--footer-veil)]">
       <div className="shell py-10">
-        {/* One row on one shared grid so the weight balances. The rings are the
-            first column, level with Navigate, and the player is last so it never
-            pushes the link columns around. All four columns are always filled:
-            a conditional card here left a dead gap on the right when the API
-            was down at build time. */}
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Three columns on one shared grid so the weight balances. The rings
+            are the first column, level with Navigate. All three are always
+            filled: a conditional card here left a dead gap on the right when the
+            API was down at build time. The playlist embed used to be a fourth
+            column, but a 56rem shell splits four ways into 188px each and the
+            embed cannot render in anything under 360px, so it lives in the hero
+            on the home page instead. */}
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           <LeetcodeRings solved={solved} />
 
           <div>
@@ -66,25 +64,6 @@ export async function SiteFooter() {
                 </li>
               ))}
             </ul>
-          </div>
-
-          {/* Compact embed: 152px tall, the shortest height Spotify offers that
-              still shows the track. Lazy so it costs nothing on first paint. */}
-          <div className="sm:col-span-2 lg:col-span-1">
-            <h2 className="text-[12px] font-semibold text-[var(--muted-foreground)]">
-              Listening to
-            </h2>
-            <iframe
-              className="mt-3 h-[152px] w-full max-w-[100%] rounded-[8px] border-0"
-              style={{ colorScheme: "normal" }}
-              src={spotifySrc}
-              width="100%"
-              height="152"
-              loading="lazy"
-              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-              allowFullScreen
-              title="Spotify playlist"
-            />
           </div>
         </div>
 

@@ -9,7 +9,7 @@ export const site = {
   tagline:
     "Fullstack and mobile developer. React, Next.js and Node on one side, C# and the Microsoft stack on the other.",
   // One line, not a paragraph. The Experience section below carries the detail.
-  summary: "Fullstack and mobile engineer. React, Next.js, Node, C#, Dynamics 365.",
+  summary: "I build cool stuff.",
   description:
     "Software engineer building fullstack web and mobile products with React, Next.js, TypeScript and Node, plus enterprise work on C#, ASP.NET and the Microsoft Power Platform.",
 } as const;

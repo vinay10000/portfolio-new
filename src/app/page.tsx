@@ -10,6 +10,7 @@ import { getRecentPosts } from "@/lib/posts";
 import { projects } from "@/lib/projects";
 import { site, socials } from "@/lib/site";
 import { PostRow, ProjectBody } from "@/components/post-row";
+import { SpotifyCard } from "@/components/spotify-card";
 import { TechRow } from "@/components/tech-tile";
 
 export default function HomePage() {
@@ -18,58 +19,78 @@ export default function HomePage() {
 
   return (
     <div className="pb-4">
-      {/* Hero. The name and the mark sit on one baseline, the way a byline
-          does in print, rather than stacking into a centred hero block. */}
-      <section className="flex items-start gap-4">
-        <Image
-          src="/logo-256.png"
-          alt={`${site.name}, ${site.role}`}
-          width={80}
-          height={80}
-          className="mt-0.5 h-16 w-16 shrink-0 rounded-full sm:h-20 sm:w-20"
-          priority
-        />
-        <div className="min-w-0 pt-1">
-          <h1 className="text-[24px] font-bold leading-8 tracking-tight text-[var(--heading-ink)]">
-            {site.name}
-          </h1>
-            <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[14px] text-[var(--muted-foreground)]">
-              <span>{site.role}</span>
-              <span aria-hidden="true">·</span>
-              <CopyButton
-                value={site.email}
-                label={site.email}
-                copiedLabel="Email copied"
-                className="border-transparent bg-transparent px-1.5 py-0.5 font-mono text-[13px] hover:border-[var(--border)] hover:bg-[var(--card)]"
-              >
-                {site.email}
-              </CopyButton>
-              <span aria-hidden="true">·</span>
-              <span>{site.location}</span>
-            </p>
+      {/* Hero on two tracks. The name, summary and socials all read at a
+          comfortable measure on the left; the player takes a fixed 380px on the
+          right, which is the narrowest it renders without truncating a track
+          title. It used to sit in the footer, where the four-column grid handed
+          it 188px and it came out a broken stub. */}
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_23.75rem] lg:gap-12">
+        <div className="min-w-0">
+          {/* Hero. The name and the mark sit on one baseline, the way a byline
+              does in print, rather than stacking into a centred hero block. */}
+          <section className="flex items-start gap-4">
+            <Image
+              src="/logo-256.png"
+              alt={`${site.name}, ${site.role}`}
+              width={80}
+              height={80}
+              className="mt-0.5 h-16 w-16 shrink-0 rounded-full sm:h-20 sm:w-20"
+              priority
+            />
+            <div className="min-w-0 pt-1">
+              <h1 className="text-[24px] font-bold leading-8 tracking-tight text-[var(--heading-ink)]">
+                {site.name}
+              </h1>
+              {/* Each separator belongs to the item it FOLLOWS, not the one it
+                  precedes. The line has to wrap in a narrow hero, and a dot
+                  placed before an item becomes the first thing on the wrapped
+                  line, which reads as a broken row. */}
+              <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[14px] text-[var(--muted-foreground)]">
+                <span className="flex items-center gap-1.5">
+                  {site.role}
+                  <span aria-hidden="true">·</span>
+                </span>
+                <CopyButton
+                  value={site.email}
+                  label={site.email}
+                  copiedLabel="Email copied"
+                  className="border-transparent bg-transparent px-1.5 py-0.5 font-mono text-[13px] after:content-['·'] hover:border-[var(--border)] hover:bg-[var(--card)]"
+                >
+                  {site.email}
+                </CopyButton>
+                <span>{site.location}</span>
+              </p>
+            </div>
+          </section>
+
+          <p className="mt-4 max-w-[72ch] text-pretty text-[14px] leading-5 text-[var(--muted-foreground)]">
+            {site.summary}
+          </p>
+
+          {/* Kept directly under the summary rather than pushed to the foot of
+              the column. Anchoring it level with the player did line the two up,
+              but it split the block in two and left the gap between them, which
+              read worse than one block of copy with clear space beneath it. */}
+          <ul className="mt-4 flex flex-wrap items-center gap-1.5">
+            {socials.map((s) => (
+              <li key={s.label}>
+                <a
+                  href={s.href}
+                  target={s.href.startsWith("mailto:") ? undefined : "_blank"}
+                  rel="noopener noreferrer"
+                  aria-label={s.label}
+                  title={s.label}
+                  className="grid h-8 w-8 place-items-center rounded-[var(--radius)] text-[var(--muted-foreground)] transition-colors duration-150 hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)]"
+                >
+                  <SocialIcon name={s.icon} width={17} height={17} />
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
-      </section>
 
-      <p className="mt-4 max-w-[72ch] text-pretty text-[14px] leading-5 text-[var(--muted-foreground)]">
-        {site.summary}
-      </p>
-
-      <ul className="mt-4 flex flex-wrap items-center gap-1.5">
-        {socials.map((s) => (
-          <li key={s.label}>
-            <a
-              href={s.href}
-              target={s.href.startsWith("mailto:") ? undefined : "_blank"}
-              rel="noopener noreferrer"
-              aria-label={s.label}
-              title={s.label}
-              className="grid h-8 w-8 place-items-center rounded-[var(--radius)] text-[var(--muted-foreground)] transition-colors duration-150 hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)]"
-            >
-              <SocialIcon name={s.icon} width={17} height={17} />
-            </a>
-          </li>
-        ))}
-      </ul>
+        <SpotifyCard />
+      </div>
 
       <Section title="Experience" className="mt-12">
         <ul>
