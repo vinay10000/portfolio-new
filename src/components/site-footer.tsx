@@ -10,8 +10,8 @@ const SPOTIFY_PLAYLIST_ID = "4pMTjn9zGah0x9dAgJ9dLR";
 export async function SiteFooter() {
   const year = new Date().getFullYear();
   const spotifySrc = `https://open.spotify.com/embed/playlist/${SPOTIFY_PLAYLIST_ID}?utm_source=generator&theme=0`;
-  // Null when the upstream API is unavailable, in which case the card is simply
-  // left out rather than rendered with made-up numbers.
+  // Never null. Falls back to a committed snapshot when the upstream API is
+  // down, so the card below can never be dropped from the build.
   const solved = await getSolved();
 
   return (
@@ -19,10 +19,11 @@ export async function SiteFooter() {
       <div className="shell py-10">
         {/* One row on one shared grid so the weight balances. The rings are the
             first column, level with Navigate, and the player is last so it never
-            pushes the link columns around. When the API is down that column is
-            dropped and the rest re-flow without a gap. */}
+            pushes the link columns around. All four columns are always filled:
+            a conditional card here left a dead gap on the right when the API
+            was down at build time. */}
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {solved ? <LeetcodeRings solved={solved} /> : null}
+          <LeetcodeRings solved={solved} />
 
           <div>
             <h2 className="text-[12px] font-semibold text-[var(--muted-foreground)]">
